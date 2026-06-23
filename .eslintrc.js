@@ -13,9 +13,10 @@ module.exports = {
   rules: {
     'prettier/prettier': 'error',
     'react/react-in-jsx-scope': 'off',
-    '@typescript-eslint/no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'react-native/no-inline-styles': 'warn',
     'react-native/no-raw-text': 'off',
+    'react/prop-types': 'off',
   },
   settings: {
     react: {

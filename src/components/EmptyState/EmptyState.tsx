@@ -21,10 +21,30 @@ const EmptyState: React.FC<EmptyStateProps> = ({ title, message, actionLabel, on
 );
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
-  title: { fontSize: 18, fontWeight: '600', color: colors.text },
-  message: { fontSize: 14, color: colors.textSecondary, marginTop: 8, textAlign: 'center' },
-  btn: { marginTop: 16, minWidth: 120 },
+  btn: {
+    marginTop: 16,
+    minWidth: 120,
+  },
+
+  container: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    padding: 32,
+  },
+
+  message: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+
+  title: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: '600',
+  },
 });
 
 export default EmptyState;

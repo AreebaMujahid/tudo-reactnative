@@ -9,4 +9,7 @@ export const colors = {
   error: '#EF4444',
   success: '#22C55E',
   white: '#FFFFFF',
+  shadow: '#000000',
+  primaryDark: '#1E40AF',
+  primaryLight: 'rgba(37, 99, 235, 0.08)',
 };

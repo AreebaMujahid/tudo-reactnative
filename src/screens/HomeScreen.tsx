@@ -1,24 +1,21 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, StyleSheet, FlatList } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
+import Toast from 'react-native-toast-message';
 import Header from '@components/Header';
 import Loader from '@components/Loader';
 import EmptyState from '@components/EmptyState';
+import ProductCard from '@components/ProductCard';
 import { useAuth } from '@hooks/useAuth';
 import { colors } from '@theme/colors';
+import { spacing } from '@theme/spacing';
+import { MOCK_PRODUCTS } from '@constants/mockProducts';
+import { Product } from '@/types/product';
 
-interface FeedItem {
-  id: string;
-  title: string;
-}
-
-const fetchFeed = async (): Promise<FeedItem[]> => {
+const fetchFeed = async (): Promise<Product[]> => {
+  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 600));
-  return [
-    { id: '1', title: 'Welcome to ProductionApp' },
-    { id: '2', title: 'Your feed is ready' },
-    { id: '3', title: 'Pull down to refresh' },
-  ];
+  return MOCK_PRODUCTS;
 };
 
 const HomeScreen = () => {
@@ -27,6 +24,29 @@ const HomeScreen = () => {
     queryKey: ['feed'],
     queryFn: fetchFeed,
   });
+
+  const handleProductPress = useCallback((product: Product) => {
+    Toast.show({
+      type: 'info',
+      text1: product.title,
+      text2: 'Product details screen coming soon!',
+    });
+  }, []);
+
+  const handleAddToCart = useCallback((product: Product) => {
+    Toast.show({
+      type: 'success',
+      text1: 'Added to Cart',
+      text2: `${product.title} has been added to your cart.`,
+    });
+  }, []);
+
+  const renderItem = useCallback(
+    ({ item }: { item: Product }) => (
+      <ProductCard product={item} onPress={handleProductPress} onAddToCart={handleAddToCart} />
+    ),
+    [handleProductPress, handleAddToCart],
+  );
 
   if (isLoading) {
     return <Loader fullScreen />;
@@ -45,37 +65,26 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Header title={`Hello, ${user?.name ?? 'User'}`} subtitle="Home" />
+      <Header title={`Hello, ${user?.name ?? 'User'}`} subtitle="Featured Products" />
       <FlatList
         data={data}
         keyExtractor={item => item.id}
         refreshing={isFetching}
         onRefresh={refetch}
+        numColumns={2}
         contentContainerStyle={styles.list}
+        columnWrapperStyle={styles.row}
         ListEmptyComponent={<EmptyState title="No items" message="Your feed is empty" />}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.cardText}>{item.title}</Text>
-          </View>
-        )}
+        renderItem={renderItem}
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  list: { paddingBottom: 24 },
-  card: {
-    marginHorizontal: 16,
-    marginTop: 16,
-    padding: 16,
-    backgroundColor: colors.surface,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  cardText: { fontSize: 16, color: colors.text },
+  container: { backgroundColor: colors.background, flex: 1 },
+  list: { padding: spacing.md, paddingBottom: spacing.lg },
+  row: { justifyContent: 'space-between' },
 });
 
 export default HomeScreen;
