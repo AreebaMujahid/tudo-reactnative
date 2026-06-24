@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ROUTES } from '@constants/routes';
-import HomeScreen from '@screens/HomeScreen';
+import HomeStackNavigator from './HomeStackNavigator';
 import ProfileScreen from '@screens/ProfileScreen';
 import SettingsScreen from '@screens/SettingsScreen';
 import { MainTabParamList } from './types';
@@ -27,7 +27,7 @@ const MainNavigator = () => (
       ),
     })}
   >
-    <Tab.Screen name={ROUTES.HOME} component={HomeScreen} />
+    <Tab.Screen name={ROUTES.HOME} component={HomeStackNavigator} />
     <Tab.Screen name={ROUTES.PROFILE} component={ProfileScreen} />
     <Tab.Screen name={ROUTES.SETTINGS} component={SettingsScreen} />
   </Tab.Navigator>

@@ -11,6 +11,11 @@ import { colors } from '@theme/colors';
 import { spacing } from '@theme/spacing';
 import { MOCK_PRODUCTS } from '@constants/mockProducts';
 import { Product } from '@/types/product';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { HomeStackParamList } from '@navigation/types';
+
+type NavigationProp = NativeStackNavigationProp<HomeStackParamList>;
 
 const fetchFeed = async (): Promise<Product[]> => {
   // Simulate API delay
@@ -19,19 +24,21 @@ const fetchFeed = async (): Promise<Product[]> => {
 };
 
 const HomeScreen = () => {
+  const navigation = useNavigation<NavigationProp>();
   const { user } = useAuth();
   const { data, isLoading, isError, refetch, isFetching } = useQuery({
     queryKey: ['feed'],
     queryFn: fetchFeed,
   });
 
-  const handleProductPress = useCallback((product: Product) => {
-    Toast.show({
-      type: 'info',
-      text1: product.title,
-      text2: 'Product details screen coming soon!',
-    });
-  }, []);
+  const handleProductPress = useCallback(
+    (product: Product) => {
+      navigation.navigate('ProductDetails', {
+        product,
+      });
+    },
+    [navigation],
+  );
 
   const handleAddToCart = useCallback((product: Product) => {
     Toast.show({
