@@ -1,52 +1,28 @@
-import { useCallback } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import * as Keychain from 'react-native-keychain';
-import Toast from 'react-native-toast-message';
-import { useAppDispatch, useAppSelector } from './useAppDispatch';
-import { setCredentials, logout as logoutAction } from '@features/auth/authSlice';
-import { authApi } from '@features/auth/authApi';
-import { handleApiError } from '@utils/errorHandler';
+import { phoneRegistration, registerUser } from '../api/authApi';
+import { verifyOtp } from '../api/authApi';
+import { loginUser } from '../api/authApi';
 
-export const useAuth = () => {
-  const dispatch = useAppDispatch();
-  const auth = useAppSelector(state => state.auth);
-
-  const loginMutation = useMutation({
-    mutationFn: authApi.login,
-    onSuccess: async data => {
-      dispatch(setCredentials(data));
-      await Keychain.setGenericPassword('auth', JSON.stringify(data));
-      Toast.show({ type: 'success', text1: 'Welcome back!', text2: data.user.name });
-    },
-    onError: handleApiError,
+export const usePhoneRegistration = () => {
+  return useMutation({
+    mutationFn: phoneRegistration,
   });
+};
 
-  const registerMutation = useMutation({
-    mutationFn: authApi.register,
-    onSuccess: async data => {
-      dispatch(setCredentials(data));
-      await Keychain.setGenericPassword('auth', JSON.stringify(data));
-      Toast.show({ type: 'success', text1: 'Account created!', text2: data.user.name });
-    },
-    onError: handleApiError,
+export const useRegister = () => {
+  return useMutation({
+    mutationFn: registerUser,
   });
+};
 
-  const logout = useCallback(async () => {
-    try {
-      await authApi.logout();
-    } finally {
-      await Keychain.resetGenericPassword();
-      dispatch(logoutAction());
-      Toast.show({ type: 'info', text1: 'Logged out' });
-    }
-  }, [dispatch]);
+export const useVerifyOtp = () => {
+  return useMutation({
+    mutationFn: verifyOtp,
+  });
+};
 
-  return {
-    ...auth,
-    login: loginMutation.mutate,
-    register: registerMutation.mutate,
-    logout,
-    isLoggingIn: loginMutation.isPending,
-    isRegistering: registerMutation.isPending,
-  };
+export const useLogin = () => {
+  return useMutation({
+    mutationFn: loginUser,
+  });
 };

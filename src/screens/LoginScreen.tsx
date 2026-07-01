@@ -7,25 +7,73 @@ import Button from '@components/Button';
 import Input from '@components/Input';
 import Header from '@components/Header';
 import { loginSchema } from '@utils/validationSchemas';
-import { useAuth } from '@hooks/useAuth';
 import { ROUTES } from '@constants/routes';
 import { AuthStackParamList } from '@navigation/types';
 import { colors } from '@theme/colors';
+import { useLogin } from '@/hooks/useAuth';
+import Toast from 'react-native-toast-message';
+import { getDeviceInfo } from '@/services/deviceService';
 
 type Props = NativeStackScreenProps<AuthStackParamList, typeof ROUTES.LOGIN>;
-type LoginForm = { email: string; password: string };
+type LoginForm = {
+  phone: string;
+  password: string;
+};
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
-  const { login, isLoggingIn } = useAuth();
+  const { mutate: loginUser, isPending } = useLogin();
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginForm>({
     resolver: yupResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: {
+      phone: '',
+      password: '',
+    }
   });
 
+  const onSubmit = async (data: LoginForm) => {
+    const deviceInfo = await getDeviceInfo();
+
+    const payload = {
+      phone: `90${data.phone}`,
+      password: data.password,
+      ...deviceInfo,
+    };
+
+    loginUser(payload, {
+      onSuccess: response => {
+        console.log('LOGIN SUCCESS', response);
+
+        if (!response.success) {
+          Toast.show({
+            type: 'error',
+            text1: response.message,
+          });
+
+          return;
+        }
+
+        Toast.show({
+          type: 'success',
+          text1: response.message,
+        });
+      },
+
+      onError: error => {
+        console.log('LOGIN ERROR', error);
+
+        Toast.show({
+          type: 'error',
+          text1:
+            (error as any)?.response?.data?.message ??
+            'Something went wrong',
+        });
+      },
+    });
+  };
   return (
     <KeyboardAvoidingView
       style={styles.flex}
@@ -36,16 +84,16 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.form}>
           <Controller
             control={control}
-            name="email"
+            name="phone"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input
-                label="Email"
+                label="Phone Number"
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
-                error={errors.email?.message}
-                keyboardType="email-address"
-                autoCapitalize="none"
+                keyboardType="phone-pad"
+                leftText="+90"
+                error={errors.phone?.message}
               />
             )}
           />
@@ -64,15 +112,9 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             )}
           />
           <Button
-            title="Sign In"
-            onPress={handleSubmit(data => login(data))}
-            loading={isLoggingIn}
-          />
-          <Button
-            title="Create Account"
-            variant="outline"
-            onPress={() => navigation.navigate(ROUTES.REGISTER)}
-            style={styles.mt}
+            title="Login"
+            loading={isPending}
+            onPress={handleSubmit(onSubmit)}
           />
         </View>
       </ScrollView>

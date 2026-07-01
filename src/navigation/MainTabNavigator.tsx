@@ -1,16 +1,12 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
-
 import HomeScreen from '@screens/HomeScreen';
 import ProfileScreen from '@screens/ProfileScreen';
 import SettingsScreen from '@screens/SettingsScreen';
-
 import { ROUTES } from '@constants/routes';
 import { MainTabParamList } from './types';
-
 const Tab = createBottomTabNavigator<MainTabParamList>();
-
 const MainTabNavigator = () => {
   return (
     <Tab.Navigator

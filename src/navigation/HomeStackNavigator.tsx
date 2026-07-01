@@ -5,7 +5,6 @@ import ProductDetailsScreen from '@screens/ProductDetailsScreen';
 import CheckoutScreen from '@screens/CheckoutScreen';
 import OrderSuccessScreen from '@screens/OrderSuccessScreen';
 import { HomeStackParamList } from './types';
-
 import { ROUTES } from '@constants/routes';
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();

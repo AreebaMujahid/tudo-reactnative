@@ -1,124 +1,129 @@
 import React from 'react';
-import { ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Button from '@components/Button';
+import { ScrollView, StyleSheet } from 'react-native';
+import { Controller, useForm } from 'react-hook-form';
 import Input from '@components/Input';
-import Header from '@components/Header';
-import { registerSchema } from '@utils/validationSchemas';
-import { useAuth } from '@hooks/useAuth';
-import { ROUTES } from '@constants/routes';
+import Button from '@components/Button';
+import UserTypeSelector from '../components/TypeSelector/UserTypeSelector';
+import { USER_TYPES } from '@constants/userTypes';
+import Header from '@/components/Header';
+import { usePhoneRegistration } from '@hooks/useAuth';
+import Toast from 'react-native-toast-message';
+import { PHONE_REGISTRATION_MESSAGES } from '@constants/authMessages';
+import { ROUTES } from '@/constants/routes';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '@navigation/types';
-import { colors } from '@theme/colors';
+import { getDeviceInfo } from '@/services/deviceService';
 
-type Props = NativeStackScreenProps<AuthStackParamList, typeof ROUTES.REGISTER>;
-type RegisterForm = {
-  name: string;
-  email: string;
+type SignupForm = {
+  phone: string;
   password: string;
-  confirmPassword: string;
+  userType: number;
 };
+type Props = NativeStackScreenProps<AuthStackParamList, typeof ROUTES.REGISTER>;
 
-const RegisterScreen: React.FC<Props> = ({ navigation }) => {
-  const { register, isRegistering } = useAuth();
+const SignupScreen: React.FC<Props> = ({ navigation }) => {
+  const { mutate: registerPhone, isPending } = usePhoneRegistration();
+
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterForm>({
-    resolver: yupResolver(registerSchema),
-    defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
+  } = useForm<SignupForm>({
+    defaultValues: {
+      phone: '',
+      password: '',
+      userType: 0,
+    },
   });
 
+  const onSubmit = (data: SignupForm) => {
+    console.log('========== SIGNUP STARTED ==========');
+
+    console.log('Form Data:', data);
+
+    const payload = {
+      phone: data.phone,
+      user_type: data.userType,
+    };
+
+    console.log('Phone Registration Payload:', payload);
+
+    registerPhone(payload, {
+      onSuccess: async response => {
+        if (!response.success) {
+          Toast.show({
+            type: 'error',
+            text1: response.message,
+          });
+
+          return;
+        }
+        switch (response.message) {
+          case PHONE_REGISTRATION_MESSAGES.USER_NOT_FOUND: {
+            const deviceInfo = await getDeviceInfo();
+
+            navigation.navigate(ROUTES.PASSWORD, {
+              phone: payload.phone,
+              userType: payload.user_type,
+
+              deviceType: deviceInfo.device_type,
+
+              deviceToken: deviceInfo.device_token,
+
+              deviceModel: deviceInfo.device_model,
+
+              hash: deviceInfo.hash,
+            });
+
+            break;
+          }
+
+          default:
+            Toast.show({
+              type: 'info',
+              text1: response.message,
+            });
+        }
+      },
+    });
+  };
+
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <Header
-          title="Create Account"
-          subtitle="Join us today"
-          showBack
-          onBack={() => navigation.goBack()}
-        />
-        <Controller
-          control={control}
-          name="name"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Full Name"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={errors.name?.message}
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Email"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={errors.email?.message}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Password"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={errors.password?.message}
-              secureTextEntry
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="confirmPassword"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Confirm Password"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={errors.confirmPassword?.message}
-              secureTextEntry
-            />
-          )}
-        />
-        <Button
-          title="Register"
-          onPress={handleSubmit(({ name, email, password }) => register({ name, email, password }))}
-          loading={isRegistering}
-        />
-        <Button
-          title="Already have an account?"
-          variant="outline"
-          onPress={() => navigation.navigate(ROUTES.LOGIN)}
-          style={styles.mt}
-        />
-      </ScrollView>
-    </KeyboardAvoidingView>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Header title="Signup" />
+      <Controller
+        control={control}
+        name="phone"
+        render={({ field: { onChange, value } }) => (
+          <Input
+            label="Phone Number"
+            value={value}
+            onChangeText={onChange}
+            keyboardType="phone-pad"
+            leftText="+90"
+            error={errors.phone?.message}
+          />
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="userType"
+        render={({ field: { onChange, value } }) => (
+          <UserTypeSelector options={USER_TYPES} selectedValue={value} onSelect={onChange} />
+        )}
+      />
+
+      <Button title="Continue" loading={isPending} onPress={handleSubmit(onSubmit)} />
+    </ScrollView>
   );
 };
 
-const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: colors.background },
-  container: { padding: 24, flexGrow: 1 },
-  mt: { marginTop: 12 },
-});
+export default SignupScreen;
 
-export default RegisterScreen;
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    padding: 24,
+  },
+});

@@ -4,6 +4,18 @@ import { Product } from '@/types/product';
 export type AuthStackParamList = {
   [ROUTES.LOGIN]: undefined;
   [ROUTES.REGISTER]: undefined;
+  [ROUTES.PASSWORD]: {
+    phone: string;
+    userType: number;
+    deviceType: string;
+    deviceToken: string;
+    deviceModel: string;
+    hash: string;
+  };
+  [ROUTES.OTP]: {
+    phone: string;
+    userType: number;
+  };
 };
 
 export type HomeStackParamList = {

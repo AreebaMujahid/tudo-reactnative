@@ -1,7 +1,10 @@
 import * as yup from 'yup';
 
 export const loginSchema = yup.object({
-  email: yup.string().email('Invalid email').required('Email is required'),
+  phone: yup
+    .string()
+    .required('Phone number is required')
+    .matches(/^\d{10}$/, 'Phone number must be exactly 10 digits'),
   password: yup.string().min(8, 'Min 8 characters').required('Password is required'),
 });
 
