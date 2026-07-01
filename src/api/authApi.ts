@@ -68,3 +68,18 @@ export const loginUser = async (
 
     return response.data;
 };
+
+export const resendOtp = async (
+    payload: ResendOtpRequest,
+): Promise<ApiResponse> => {
+    const response = await api.get<ApiResponse>(
+        API_ENDPOINTS.RESEND_OTP,
+        {
+            params: {
+                phone: payload.phone,
+            },
+        },
+    );
+
+    return response.data;
+};

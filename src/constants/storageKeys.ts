@@ -1,5 +1,4 @@
 export const STORAGE_KEYS = {
-  AUTH: 'persist:auth',
-  ACCESS_TOKEN: 'access_token',
-  REFRESH_TOKEN: 'refresh_token',
+  AUTH_TOKEN: 'auth_token',
+  USER_TYPE: 'user_type',
 } as const;

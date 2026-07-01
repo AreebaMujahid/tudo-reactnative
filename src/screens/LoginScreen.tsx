@@ -13,6 +13,11 @@ import { colors } from '@theme/colors';
 import { useLogin } from '@/hooks/useAuth';
 import Toast from 'react-native-toast-message';
 import { getDeviceInfo } from '@/services/deviceService';
+import { useDispatch } from 'react-redux';
+import { login } from '@/store/authSlice';
+import { authStorage } from '@/services/authStorage';
+import { Text } from 'react-native';
+import { Pressable } from 'react-native';
 
 type Props = NativeStackScreenProps<AuthStackParamList, typeof ROUTES.LOGIN>;
 type LoginForm = {
@@ -21,6 +26,7 @@ type LoginForm = {
 };
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
+  const dispatch = useDispatch();
   const { mutate: loginUser, isPending } = useLogin();
   const {
     control,
@@ -44,9 +50,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     };
 
     loginUser(payload, {
-      onSuccess: response => {
-        console.log('LOGIN SUCCESS', response);
-
+      onSuccess: async response => {
         if (!response.success) {
           Toast.show({
             type: 'error',
@@ -55,6 +59,19 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
           return;
         }
+
+        const token = response.data.token;
+
+        // Save securely
+        await authStorage.saveToken(token);
+
+        // Update Redux
+        dispatch(
+          login({
+            token,
+            user: response.data,
+          }),
+        );
 
         Toast.show({
           type: 'success',
@@ -116,6 +133,22 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             loading={isPending}
             onPress={handleSubmit(onSubmit)}
           />
+          <View style={styles.signupContainer}>
+            <Text style={styles.signupText}>
+              Don't have an account?
+            </Text>
+
+            <Pressable
+              onPress={() =>
+                navigation.navigate(
+                  ROUTES.REGISTER,
+                )
+              }>
+              <Text style={styles.signupLink}>
+                Sign Up
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -127,6 +160,24 @@ const styles = StyleSheet.create({
   container: { flexGrow: 1 },
   form: { padding: 24 },
   mt: { marginTop: 12 },
+  signupContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+
+  signupText: {
+    color: colors.textSecondary,
+    fontSize: 15,
+  },
+
+  signupLink: {
+    color: colors.primary,
+    fontSize: 15,
+    fontWeight: '600',
+    marginLeft: 4,
+  },
 });
 
 export default LoginScreen;

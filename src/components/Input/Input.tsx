@@ -29,13 +29,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 6,
-    color: colors.text,
-  },
-
   // NEW
   inputContainer: {
     flexDirection: 'row',
@@ -47,6 +40,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
 
     paddingHorizontal: 12,
+  },
+
+  label: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 6,
+    color: colors.text,
   },
 
   // NEW

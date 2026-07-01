@@ -1,58 +1,71 @@
 import axios from 'axios';
-
+import { store } from '@store/index'
 export const api = axios.create({
-  baseURL: 'https://backend-dev.tudu.tech/api',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-    'X-App-Version': '1.0.88',
-  },
+    baseURL: 'https://backend-dev.tudu.tech/api',
+    timeout: 10000,
+    headers: {
+        'Content-Type': 'application/json',
+        'X-App-Version': '1.0.88',
+    },
 });
 
+api.interceptors.request.use(
+    config => {
+        const token = store.getState().auth.token;
+
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+
+        return config;
+    },
+    error => Promise.reject(error),
+);
+
 api.interceptors.request.use(request => {
-  console.log('======================');
-  console.log('API REQUEST');
-  console.log('URL:', request.baseURL + request.url);
-  console.log('METHOD:', request.method);
-  console.log('HEADERS:', request.headers);
+    console.log('======================');
+    console.log('API REQUEST');
+    console.log('URL:', request.baseURL + request.url);
+    console.log('METHOD:', request.method);
+    console.log('HEADERS:', request.headers);
 
-  console.log('PAYLOAD:', request.data);
+    console.log('PAYLOAD:', request.data);
 
-  console.log('======================');
+    console.log('======================');
 
-  return request;
+    return request;
 });
 
 api.interceptors.response.use(
-  response => {
-    console.log('======================');
+    response => {
+        console.log('======================');
 
-    console.log('API RESPONSE');
+        console.log('API RESPONSE');
 
-    console.log('STATUS:', response.status);
+        console.log('STATUS:', response.status);
 
-    console.log('DATA:', response.data);
+        console.log('DATA:', response.data);
 
-    console.log('======================');
+        console.log('======================');
 
-    return response;
-  },
+        return response;
+    },
 
-  error => {
-    console.log('======================');
+    error => {
+        console.log('======================');
 
-    console.log('API ERROR');
+        console.log('API ERROR');
 
-    console.log('STATUS:', error.response?.status);
+        console.log('STATUS:', error.response?.status);
 
-    console.log('MESSAGE:', error.message);
+        console.log('MESSAGE:', error.message);
 
-    console.log('SERVER ERROR:', error.response?.data);
+        console.log('SERVER ERROR:', error.response?.data);
 
-    console.log('FULL ERROR:', error);
+        console.log('FULL ERROR:', error);
 
-    console.log('======================');
+        console.log('======================');
 
-    return Promise.reject(error);
-  },
+        return Promise.reject(error);
+    },
 );
