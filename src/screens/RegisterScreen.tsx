@@ -60,7 +60,9 @@ const SignupScreen: React.FC<Props> = ({ navigation }) => {
         }
         switch (response.message) {
           case PHONE_REGISTRATION_MESSAGES.USER_NOT_FOUND: {
+            console.log('User not foundd');
             const deviceInfo = await getDeviceInfo();
+            console.log('device info', deviceInfo);
 
             navigation.navigate(ROUTES.PASSWORD, {
               phone: payload.phone,

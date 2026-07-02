@@ -15,20 +15,21 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ user: User; accessToken: string; refreshToken: string }>,
+      action: PayloadAction<{
+        user: User | null;
+        accessToken: string;
+        refreshToken?: string | null;
+      }>,
     ) => {
       state.user = action.payload.user;
       state.accessToken = action.payload.accessToken;
-      state.refreshToken = action.payload.refreshToken;
+      state.refreshToken = action.payload.refreshToken ?? null;
       state.isAuthenticated = true;
     },
-    logout: state => {
-      state.user = null;
-      state.accessToken = null;
-      state.refreshToken = null;
-      state.isAuthenticated = false;
-      state.isHydrated = true;
-    },
+    logout: () => ({
+      ...initialState,
+      isHydrated: true,
+    }),
     setHydrated: (state, action: PayloadAction<boolean>) => {
       state.isHydrated = action.payload;
     },

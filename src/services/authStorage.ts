@@ -1,11 +1,12 @@
 import * as Keychain from 'react-native-keychain';
 import { STORAGE_KEYS } from '@constants/storageKeys';
+
 export const authStorage = {
-  async saveToken(token: string) {
+  async saveToken(token: string): Promise<void> {
     await Keychain.setGenericPassword(STORAGE_KEYS.AUTH_TOKEN, token);
   },
 
-  async getToken() {
+  async getToken(): Promise<string | null> {
     const credentials = await Keychain.getGenericPassword();
 
     if (!credentials) {
@@ -15,7 +16,11 @@ export const authStorage = {
     return credentials.password;
   },
 
-  async removeToken() {
+  async removeToken(): Promise<void> {
     await Keychain.resetGenericPassword();
+  },
+
+  async clearSession(): Promise<void> {
+    await this.removeToken();
   },
 };

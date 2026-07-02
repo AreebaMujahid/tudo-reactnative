@@ -1,7 +1,8 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import Config from 'react-native-config';
 import { store } from '@store/index';
-import { logout, setCredentials } from '@features/auth/authSlice';
+import { setCredentials } from '@features/auth/authSlice';
+import { clearAuthSession } from '@/services/authSessionService';
 
 const apiClient = axios.create({
   baseURL: Config.API_BASE_URL ?? 'https://api.dev.example.com',
@@ -73,7 +74,7 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        store.dispatch(logout());
+        await clearAuthSession();
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

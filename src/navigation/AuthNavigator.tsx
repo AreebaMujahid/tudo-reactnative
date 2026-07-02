@@ -12,10 +12,7 @@ const AuthNavigator = () => (
     <Stack.Screen name={ROUTES.LOGIN} component={LoginScreen} />
     <Stack.Screen name={ROUTES.REGISTER} component={RegisterScreen} />
     <Stack.Screen name={ROUTES.PASSWORD} component={PasswordScreen} />
-    <Stack.Screen
-      name={ROUTES.OTP}
-      component={OtpScreen}
-    />
+    <Stack.Screen name={ROUTES.OTP} component={OtpScreen} />
   </Stack.Navigator>
 );
 export default AuthNavigator;

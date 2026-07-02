@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, TouchableOpacity } from 'react-native';
 import Header from '@components/Header';
-import Modal from '@components/Modal';
-import Button from '@components/Button';
-import { useAuth } from '@hooks/useAuth';
+import LogoutConfirmModal from '@components/LogoutConfirmModal';
+import { useLogoutConfirmation } from '@hooks/useLogoutConfirmation';
 import { colors } from '@theme/colors';
 
 const SettingsScreen = () => {
-  const { logout } = useAuth();
   const [notifications, setNotifications] = useState(true);
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const {
+    isModalVisible,
+    isLoggingOut,
+    openLogoutConfirmation,
+    closeLogoutConfirmation,
+    confirmLogout,
+  } = useLogoutConfirmation();
 
   return (
     <View style={styles.container}>
@@ -22,53 +26,32 @@ const SettingsScreen = () => {
           trackColor={{ true: colors.primary }}
         />
       </View>
-      <TouchableOpacity style={styles.row} onPress={() => setShowLogoutModal(true)}>
+      <TouchableOpacity style={styles.row} onPress={openLogoutConfirmation}>
         <Text style={[styles.label, styles.danger]}>Logout</Text>
       </TouchableOpacity>
 
-      <Modal
-        visible={showLogoutModal}
-        onClose={() => setShowLogoutModal(false)}
-        title="Confirm Logout"
-      >
-        <Text style={styles.modalText}>Are you sure you want to logout?</Text>
-        <Button
-          title="Yes, Logout"
-          onPress={() => {
-            setShowLogoutModal(false);
-            logout();
-          }}
-        />
-        <Button
-          title="Cancel"
-          variant="outline"
-          onPress={() => setShowLogoutModal(false)}
-          style={styles.mt}
-        />
-      </Modal>
+      <LogoutConfirmModal
+        visible={isModalVisible}
+        loading={isLoggingOut}
+        onConfirm={confirmLogout}
+        onCancel={closeLogoutConfirmation}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { backgroundColor: colors.background, flex: 1 },
+  danger: { color: colors.error },
+  label: { color: colors.text, fontSize: 16 },
   row: {
+    alignItems: 'center',
+    borderBottomColor: colors.border,
+    borderBottomWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
-  label: { fontSize: 16, color: colors.text },
-  danger: { color: colors.error },
-  modalText: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  mt: { marginTop: 8 },
 });
 
 export default SettingsScreen;

@@ -1,85 +1,72 @@
 import { api } from './axios';
 import { formatTurkeyPhone } from '@/utils/phone';
 import {
-    PhoneRegistrationPayload,
-    PhoneRegistrationResponse,
-    RegisterPayload,
-    RegisterResponse,
+  PhoneRegistrationPayload,
+  PhoneRegistrationResponse,
+  RegisterPayload,
+  RegisterResponse,
+  ResendOtpRequest,
 } from '../types/auth';
+import { ApiResponse } from '../types/auth';
 import { API_ENDPOINTS } from '@/constants/apiEndpoints';
 
 export const phoneRegistration = async (
-    payload: PhoneRegistrationPayload,
+  payload: PhoneRegistrationPayload,
 ): Promise<PhoneRegistrationResponse> => {
-    const requestBody = {
-        ...payload,
-        phone: formatTurkeyPhone(payload.phone),
-    };
-    console.log('Request Body:', requestBody);
-    const response = await api.post(API_ENDPOINTS.PHONE_REGISTRATION, requestBody);
-    return response.data;
+  const requestBody = {
+    ...payload,
+    phone: formatTurkeyPhone(payload.phone),
+  };
+  console.log('Request Body:', requestBody);
+  const response = await api.post(API_ENDPOINTS.PHONE_REGISTRATION, requestBody);
+  return response.data;
 };
 
 export const registerUser = async (payload: RegisterPayload): Promise<RegisterResponse> => {
-    console.log('payload receive in /register endpoint is', payload);
-    const { data } = await api.post(API_ENDPOINTS.REGISTER, payload);
+  console.log('payload receive in /register endpoint is', payload);
+  const { data } = await api.post(API_ENDPOINTS.REGISTER, payload);
 
-    return data;
+  return data;
 };
 export type VerifyOtpPayload = {
-    phone: string;
-    otp: string;
-    user_type: number;
+  phone: string;
+  otp: string;
+  user_type: number;
 };
 
 export type VerifyOtpResponse = {
-    success: boolean;
-    message: string;
-    token?: string;
+  success: boolean;
+  message: string;
+  token?: string;
 };
 
-export const verifyOtp = async (
-    payload: VerifyOtpPayload,
-): Promise<VerifyOtpResponse> => {
-    const response = await api.post(
-        API_ENDPOINTS.VERIFY_OTP,
-        payload,
-    );
+export const verifyOtp = async (payload: VerifyOtpPayload): Promise<VerifyOtpResponse> => {
+  const response = await api.post(API_ENDPOINTS.VERIFY_OTP, payload);
 
-    return response.data;
+  return response.data;
 };
 
 export interface LoginPayload {
-    phone: string;
-    password: string;
-    device_type: string;
-    device_token: string;
-    device_model: string;
-    user_type?: number;
+  phone: string;
+  password: string;
+  device_type: string;
+  device_token: string;
+  device_model: string;
+  user_type?: number;
 }
 
-export const loginUser = async (
-    payload: LoginPayload,
-) => {
-    const response = await api.post(
-        API_ENDPOINTS.LOGIN,
-        payload,
-    );
+export const loginUser = async (payload: LoginPayload) => {
+  const response = await api.post(API_ENDPOINTS.LOGIN, payload);
 
-    return response.data;
+  return response.data;
 };
 
-export const resendOtp = async (
-    payload: ResendOtpRequest,
-): Promise<ApiResponse> => {
-    const response = await api.get<ApiResponse>(
-        API_ENDPOINTS.RESEND_OTP,
-        {
-            params: {
-                phone: payload.phone,
-            },
-        },
-    );
+export const resendOtp = async (payload: ResendOtpRequest): Promise<ApiResponse> => {
+  const response = await api.get<ApiResponse>(API_ENDPOINTS.RESEND_OTP, {
+    params: {
+      phone: payload.phone,
+    },
+  });
 
-    return response.data;
+  return response.data;
 };

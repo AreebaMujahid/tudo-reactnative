@@ -1,7 +1,10 @@
 export interface User {
-  id: string;
-  email: string;
-  name: string;
+  id?: string;
+  email?: string;
+  name?: string;
+  phone?: string;
+  token?: string;
+  [key: string]: unknown;
 }
 
 export interface AuthState {

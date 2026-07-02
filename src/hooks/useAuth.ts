@@ -1,6 +1,23 @@
+import { useCallback } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
 import { phoneRegistration, registerUser } from '../api/authApi';
 import { verifyOtp, loginUser, resendOtp } from '../api/authApi';
+import { RootState } from '@store/index';
+import { clearAuthSession } from '@/services/authSessionService';
+
+export const useAuth = () => {
+  const auth = useSelector((state: RootState) => state.auth);
+
+  const logout = useCallback(async () => {
+    await clearAuthSession();
+  }, []);
+
+  return {
+    ...auth,
+    logout,
+  };
+};
 
 export const usePhoneRegistration = () => {
   return useMutation({

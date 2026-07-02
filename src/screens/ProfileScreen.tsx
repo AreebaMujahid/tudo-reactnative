@@ -5,11 +5,20 @@ import Header from '@components/Header';
 import Button from '@components/Button';
 import SettingItem from '@components/SettingItem';
 import { useAuth } from '@hooks/useAuth';
+import { useLogoutConfirmation } from '@hooks/useLogoutConfirmation';
+import LogoutConfirmModal from '@components/LogoutConfirmModal';
 import { colors } from '@theme/colors';
 import { spacing } from '@theme/spacing';
 
 const ProfileScreen = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const {
+    isModalVisible,
+    isLoggingOut,
+    openLogoutConfirmation,
+    closeLogoutConfirmation,
+    confirmLogout,
+  } = useLogoutConfirmation();
 
   const handleSettingPress = useCallback((title: string) => {
     Toast.show({
@@ -88,8 +97,21 @@ const ProfileScreen = () => {
         </View>
 
         {/* Logout Button */}
-        <Button title="Logout" variant="outline" onPress={logout} style={styles.logoutBtn} />
+        <Button
+          title="Logout"
+          variant="outline"
+          loading={isLoggingOut}
+          onPress={openLogoutConfirmation}
+          style={styles.logoutBtn}
+        />
       </ScrollView>
+
+      <LogoutConfirmModal
+        visible={isModalVisible}
+        loading={isLoggingOut}
+        onConfirm={confirmLogout}
+        onCancel={closeLogoutConfirmation}
+      />
     </View>
   );
 };
